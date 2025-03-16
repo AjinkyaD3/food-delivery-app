@@ -44,7 +44,7 @@ menuRouter.post("/add", upload.single("image"), async (req, res) => {
         }
 
         const newMenu = new Menu({
-            restaurant_id,
+            restaurant_id: new mongoose.Types.ObjectId(restaurant_id),
             categories: categories ? categories.split(",") : [],
             food_items: parsedFoodItems.map(item => ({
                 ...item,
@@ -60,19 +60,26 @@ menuRouter.post("/add", upload.single("image"), async (req, res) => {
 });
 
 
-menuRouter.get("/:restaurant_id", async (req, res) => {
+menuRouter.get("/:id", async (req, res) => {
     try {
-        const { restaurant_id } = req.params;
-        const objectId = new mongoose.Types.ObjectId(restaurant_id);
-        const menu = await Menu.findOne({ restaurant_id: "67d6a4a096505ee188dcc661" })
+        const { id } = req.params;
+
+        // ✅ Convert the id to ObjectId
+        const objectId = new mongoose.Types.ObjectId(id);
+
+        // ✅ Fetch menu by restaurant_id
+        const menu = await Menu.findOne({ restaurant_id: objectId });
+        console.log(await Menu.find())
         if (!menu) {
             return res.status(404).json({ success: false, message: "Menu not found" });
         }
+
         res.json({ success: true, data: menu });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
 
 
 /**
