@@ -70,11 +70,27 @@ const MenuPage = () => {
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-medium">₹{item.price}</p>
                   <button
-                    onClick={() => addToCart(item._id, restaurantId)}
+                    onClick={() => {
+                      console.log("🛒 Button Clicked - Item Data:", {
+                        _id: item._id,
+                        name: item.name,
+                        price: item.price,
+                        image_url: item.image_url,
+                        restaurant_id: restaurantId,
+                      });
+                      addToCart({
+                        _id: item._id,
+                        name: item.name,
+                        price: item.price,
+                        image_url: item.image_url,
+                        restaurant_id: restaurantId,
+                      });
+                    }}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-transform transform hover:scale-105"
                   >
                     Add to Cart
                   </button>
+
                 </div>
               </div>
             </div>

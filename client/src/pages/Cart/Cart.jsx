@@ -13,6 +13,7 @@ const Cart = () => {
     promoCode,
     discount,
     url,
+    food_list
   } = useContext(StoreContext);
 
   const [enteredPromo, setEnteredPromo] = useState("");
@@ -23,15 +24,15 @@ const Cart = () => {
   useEffect(() => {
     console.log("📦 cartItems:", cartItems); // Debugging
 
-  }, [, cartItems]); // Ensure we check when cart updates
-  
+  }, [cartItems]); // Ensure we check when cart updates
+
 
   // ✅ Handle promo code application
   const handleApplyPromo = () => {
     applyPromoCode(enteredPromo);
   };
 
-  if (loading) return <p>Loading cart...</p>;
+  // if (loading) return <p>Loading cart...</p>;
 
   return (
     <div className="cart">
@@ -51,42 +52,68 @@ const Cart = () => {
             </div>
             <hr />
 
-            {food_list.map((item) => {
-              if (cartItems[item._id] > 0) {
-                return (
-                  <React.Fragment key={item._id}>
-                    <div className="cart-items-title cart-items-item">
-                      <img src={`${url}/images/${item.image}`} alt={item.name} />
-                      <p>{item.name}</p>
-                      <p>₹{item.price}</p>
+            {cartItems &&
+  Object.keys(cartItems).map((itemId) => {
+    const item = cartItems[itemId];
+    
+    // Debugging logs
+    console.log("🛒 Cart Item Debug:", item);
 
-                      <div className="cart-quantity-controls">
-                        <button
-                          className="cart-btn"
-                          onClick={() => removeFromCart(item._id)}
-                        >
-                          -
-                        </button>
-                        <span>{cartItems[item._id]}</span>
-                        <button
-                          className="cart-btn"
-                          onClick={() => addToCart(item._id)}
-                        >
-                          +
-                        </button>
-                      </div>
+    if (item?.quantity > 0) {
+      return (
+        <React.Fragment key={itemId}>
+          <div className="cart-items-title cart-items-item">
+            {/* Product Image */}
+            <img
+              src={`${url}/images/${item.image_url || "default.jpg"}`}
+              alt={item.name}
+              className="cart-item-image"
+            />
 
-                      <p>₹{item.price * cartItems[item._id]}</p>
-                      <p onClick={() => removeFromCart(item._id)} className="cross">
-                        x
-                      </p>
-                    </div>
-                    <hr />
-                  </React.Fragment>
-                );
-              }
-              return null;
-            })}
+            {/* Product Name */}
+            <p className="cart-item-name">{item.name}</p>
+
+            {/* Product Price */}
+            <p className="cart-item-price">₹{item.price}</p>
+
+            {/* Quantity Controls */}
+            <div className="cart-quantity-controls">
+              <button
+                className="cart-btn"
+                onClick={() => removeFromCart(itemId)}
+              >
+                -
+              </button>
+              <span>{item.quantity || 1}</span>
+              <button
+                className="cart-btn"
+                onClick={() => addToCart(item._id)}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Total Price */}
+            <p className="cart-item-total-price">
+              ₹{item.price * (item.quantity || 1)}
+            </p>
+
+            {/* Remove Item */}
+            <p
+              onClick={() => removeFromCart(itemId)}
+              className="cart-item-remove cross"
+            >
+              x
+            </p>
+          </div>
+          <hr />
+        </React.Fragment>
+      );
+    }
+    return null;
+  })}
+
+
           </div>
 
           {/* Bottom Section */}
