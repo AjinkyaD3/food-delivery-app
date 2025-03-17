@@ -1,9 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 
 const MenuPage = () => {
+
+  // ===========
+  const { debugContext } = useContext(StoreContext);
+  // ===========
   const { addToCart, url } = useContext(StoreContext);
   const { restaurantId } = useParams();
   const [menuItems, setMenuItems] = useState([]);
@@ -15,7 +19,7 @@ const MenuPage = () => {
       setLoading(true);
       try {
         const response = await axios.get(`${url}/api/menu/${restaurantId}`);
-        setMenuItems(response.data.data.food_items);
+        setMenuItems(response.data.data?.food_items || []); // ✅ Handle missing food_items
       } catch (error) {
         console.error("Error fetching menu items:", error);
       } finally {
@@ -42,6 +46,7 @@ const MenuPage = () => {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-center">Restaurant Menu</h1>
       </div>
+      <button onClick={debugContext}>Debug Context</button>;
 
       {/* Menu Items List */}
       <div className="space-y-6">
@@ -49,15 +54,15 @@ const MenuPage = () => {
           menuItems.map((item) => (
             <div key={item._id} className="flex border-b pb-4">
               <div className="w-20 h-20 mr-4">
-                {/* <img
-                  src='/'
-                  alt={item.name}
+                <img
+                  src={`${url}/${item.image_url}`}
+                  alt={item.name || "Food Item"}
                   className="w-full h-full object-cover rounded"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "/";
+                    e.target.src = "/default-image.jpg"; // ✅ Fallback image
                   }}
-                /> */}
+                />
               </div>
               <div className="flex-grow">
                 <h3 className="font-medium">{item.name}</h3>
@@ -65,8 +70,8 @@ const MenuPage = () => {
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-medium">₹{item.price}</p>
                   <button
-                    onClick={() => addToCart(item._id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                    onClick={() => addToCart(item._id, restaurantId)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-transform transform hover:scale-105"
                   >
                     Add to Cart
                   </button>
