@@ -13,17 +13,18 @@ const Cart = () => {
     promoCode,
     discount,
     url,
+    food_list,
+    FoodDetails
   } = useContext(StoreContext);
-
+// console.log('card items is here',cartItems)
   const [enteredPromo, setEnteredPromo] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   // ✅ Ensure food list is loaded before rendering
   useEffect(() => {
-    console.log("📦 cartItems:", cartItems); // Debugging
-
-  }, [, cartItems]); // Ensure we check when cart updates
+    console.log("📦 cartItems:", cartItems);
+  }, [cartItems]); // Ensure we check when cart updates
   
 
   // ✅ Handle promo code application
@@ -31,11 +32,13 @@ const Cart = () => {
     applyPromoCode(enteredPromo);
   };
 
-  if (loading) return <p>Loading cart...</p>;
+  // if (loading) return <p>Loading cart...</p>;
 
   return (
     <div className="cart">
       <h1>Your Cart</h1>
+     {/* {console.log(cartItems)} */}
+     {/* {console.log('hello',food_list)} */}
       {Object.keys(cartItems).length === 0 ? (
         <p>Your cart is empty! Add some items to proceed.</p>
       ) : (
@@ -50,9 +53,9 @@ const Cart = () => {
               <p>Remove</p>
             </div>
             <hr />
-
+{/* //changes needs to made here  */}
             {food_list.map((item) => {
-              if (cartItems[item._id] > 0) {
+           
                 return (
                   <React.Fragment key={item._id}>
                     <div className="cart-items-title cart-items-item">
@@ -76,7 +79,7 @@ const Cart = () => {
                         </button>
                       </div>
 
-                      <p>₹{item.price * cartItems[item._id]}</p>
+                      <p>₹{item.price * item.price}</p>
                       <p onClick={() => removeFromCart(item._id)} className="cross">
                         x
                       </p>
@@ -84,7 +87,7 @@ const Cart = () => {
                     <hr />
                   </React.Fragment>
                 );
-              }
+              
               return null;
             })}
           </div>
