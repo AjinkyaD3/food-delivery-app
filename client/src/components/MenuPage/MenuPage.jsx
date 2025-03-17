@@ -1,50 +1,83 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom"; // Import useParams
+import { useParams } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
-import "./MenuPage.css";
 
 const MenuPage = () => {
   const { addToCart, url } = useContext(StoreContext);
-  const { restaurantId } = useParams(); // ✅ Get restaurantId from URL
-  const [menuItems, setMenuItems] = useState([]); // ✅ State for menu items
+  const { restaurantId } = useParams();
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch menu items from API
+  // Fetch menu items from API
   useEffect(() => {
     const fetchMenuItems = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`${url}/api/menu/${restaurantId}`);
         setMenuItems(response.data.data.food_items);
       } catch (error) {
         console.error("Error fetching menu items:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (restaurantId) {
       fetchMenuItems();
     }
-  }, [restaurantId]);
+  }, [restaurantId, url]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500">Loading menu items...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="menu-page">
-      <h1>Our Menu</h1>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Simple Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-center">Restaurant Menu</h1>
+      </div>
 
-      {/* ✅ Display menu items */}
-      <div className="menu-items">
+      {/* Menu Items List */}
+      <div className="space-y-6">
         {menuItems.length > 0 ? (
           menuItems.map((item) => (
-            <div key={item._id} className="menu-item">
-              <img src={`${url}/${item.image_url}`} alt={item.name} />
-              <h3>{item.name}</h3>
-              <p>₹{item.price}</p>
-              <p>{item.description}</p>
-
-              {/* ✅ Add to Cart Button */}
-              <button onClick={() => addToCart(item._id)}>Add to Cart</button>
+            <div key={item._id} className="flex border-b pb-4">
+              <div className="w-20 h-20 mr-4">
+                {/* <img
+                  src='/'
+                  alt={item.name}
+                  className="w-full h-full object-cover rounded"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/";
+                  }}
+                /> */}
+              </div>
+              <div className="flex-grow">
+                <h3 className="font-medium">{item.name}</h3>
+                <p className="text-sm text-gray-600 mb-1">{item.description}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="font-medium">₹{item.price}</p>
+                  <button
+                    onClick={() => addToCart(item._id)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
             </div>
           ))
         ) : (
-          <p>Loading menu items...</p>
+          <div className="text-center py-8">
+            <p className="text-gray-500">No menu items available.</p>
+          </div>
         )}
       </div>
     </div>
