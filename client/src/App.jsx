@@ -8,7 +8,9 @@ import { useState } from "react";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
 import Verify from "./pages/Verify/Verify";
 import MyOrders from "./pages/MyOrders/MyOrders";
-
+import MenuPage from "./components/MenuPage/MenuPage";
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   return (
@@ -22,7 +24,17 @@ const App = () => {
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/myorders" element={<MyOrders />} />
+          <Route path="/menu/:restaurantId" element={<MenuPage />} />
+          <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+            }
+            />
         </Routes>
+      
       </div>
       <Footer />
     </>
