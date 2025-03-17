@@ -6,7 +6,7 @@ import axios from "axios";
 const MenuPage = () => {
 
   // ===========
-  const { debugContext } = useContext(StoreContext);
+ 
   // ===========
   const { addToCart, url } = useContext(StoreContext);
   const { restaurantId } = useParams();
@@ -46,7 +46,7 @@ const MenuPage = () => {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-center">Restaurant Menu</h1>
       </div>
-      <button onClick={debugContext}>Debug Context</button>;
+ 
 
       {/* Menu Items List */}
       <div className="space-y-6">

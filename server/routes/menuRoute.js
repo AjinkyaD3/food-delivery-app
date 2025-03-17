@@ -69,7 +69,7 @@ menuRouter.get("/:id", async (req, res) => {
 
         // ✅ Fetch menu by restaurant_id
         const menu = await Menu.findOne({ restaurant_id: objectId });
-        console.log(await Menu.find())
+
         if (!menu) {
             return res.status(404).json({ success: false, message: "Menu not found" });
         }

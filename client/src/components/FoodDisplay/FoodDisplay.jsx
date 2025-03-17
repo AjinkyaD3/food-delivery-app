@@ -1,10 +1,7 @@
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { StoreContext } from "../../context/StoreContext";
 import "./FoodDisplay.css";
 
-const FoodDisplay = ({ category }) => {
-  const { restaurants } = useContext(StoreContext);
+const FoodDisplay = ({ category, restaurants }) => {  // Use the prop instead of context
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleRestaurantClick = (restaurantId) => {
@@ -18,7 +15,7 @@ const FoodDisplay = ({ category }) => {
         {category && <span className="category-tag">{category}</span>}
       </div>
 
-      {restaurants.length > 0 ? (
+      {restaurants && restaurants.length > 0 ? (
         <div className="restaurant-grid">
           {restaurants.map((restaurant) => (
             <div 
