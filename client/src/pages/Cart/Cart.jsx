@@ -13,19 +13,30 @@ const Cart = () => {
     promoCode,
     discount,
     url,
+<<<<<<< HEAD
     food_list
+=======
+    food_list,
+    FoodDetails
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
   } = useContext(StoreContext);
-
+// console.log('card items is here',cartItems)
   const [enteredPromo, setEnteredPromo] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   // ✅ Ensure food list is loaded before rendering
   useEffect(() => {
+<<<<<<< HEAD
     console.log("📦 cartItems:", cartItems); // Debugging
 
   }, [cartItems]); // Ensure we check when cart updates
 
+=======
+    console.log("📦 cartItems:", cartItems);
+  }, [cartItems]); // Ensure we check when cart updates
+  
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
 
   // ✅ Handle promo code application
   const handleApplyPromo = () => {
@@ -37,6 +48,8 @@ const Cart = () => {
   return (
     <div className="cart">
       <h1>Your Cart</h1>
+     {/* {console.log(cartItems)} */}
+     {/* {console.log('hello',food_list)} */}
       {Object.keys(cartItems).length === 0 ? (
         <p>Your cart is empty! Add some items to proceed.</p>
       ) : (
@@ -51,6 +64,7 @@ const Cart = () => {
               <p>Remove</p>
             </div>
             <hr />
+<<<<<<< HEAD
 
             {cartItems &&
   Object.keys(cartItems).map((itemId) => {
@@ -112,8 +126,33 @@ const Cart = () => {
     }
     return null;
   })}
+=======
+{/* //changes needs to made here  */}
+            {food_list.map((item) => {
+           
+                return (
+                  <React.Fragment key={item._id}>
+                    <div className="cart-items-title cart-items-item">
+                      <img src={`${url}/images/${item.image}`} alt={item.name} />
+                      <p>{item.name}</p>
+                      <p>₹{item.price}</p>
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
 
 
+<<<<<<< HEAD
+=======
+                      <p>₹{item.price * item.price}</p>
+                      <p onClick={() => removeFromCart(item._id)} className="cross">
+                        x
+                      </p>
+                    </div>
+                    <hr />
+                  </React.Fragment>
+                );
+              
+              return null;
+            })}
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
           </div>
 
           {/* Bottom Section */}
