@@ -10,16 +10,26 @@ const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/restaurants/list/")
-      .then((response) => response.json())
-      .then((data) => setRestaurants(data))
-      .catch((error) => console.error("Error fetching restaurants:", error));
+    const fetchRestaurants = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/restaurants/list/");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+        setRestaurants(data.data || []);
+        console.log("✅ Fetched Restaurants:", data.data);
+      } catch (error) {
+        console.error("❌ Error fetching restaurants:", error);
+        setRestaurants([]); 
+      }
+    };
+
+    fetchRestaurants();
   }, []);
 
   return (
     <div>
       <Header />
-      
       <ExploreMenu category={category} setCategory={setCategory} />
       <FoodDisplay category={category} restaurants={restaurants} />
       <AppDownload />

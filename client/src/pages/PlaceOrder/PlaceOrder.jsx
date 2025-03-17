@@ -1,57 +1,13 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, token, url, food_list, cartItems } =
-    useContext(StoreContext);
-
-  const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    pincode: "",
-    country: "",
-    phone: "",
-  });
-
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
-  };
-
-  const placeOrder = async (event) => {
-    event.preventDefault();
-    let orderItems = [];
-    food_list.map((item) => {
-      if (cartItems[item._id]) {
-        let itemInfo = item;
-        itemInfo["quantity"] = cartItems[item._id];
-        orderItems.push(itemInfo);
-      }
-    });
-    let orderData = {
-      address: data,
-      items: orderItems,
-      amount: getTotalCartAmount() + 99,
-    };
-    let response = await axios.post(url + "/api/order/place", orderData, {
-      headers: { token },
-    });
-    if (response.data.success) {
-      const { session_url } = response.data;
-      window.location.replace(session_url);
-    } else {
-      alert("Error");
-    }
-  };
-
+  const { getTotalCartAmount, token, url, cartItems, food_list } = useContext(StoreContext);
+  const [pickupTime, setPickupTime] = useState("");
+  const [orderType, setOrderType] = useState("takeaway");
   const navigate = useNavigate();
   const { buttonRef } = useContext(StoreContext);
 
@@ -68,117 +24,96 @@ const PlaceOrder = () => {
     }
   }, [token, getTotalCartAmount, navigate]);
 
+  useEffect(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+    setPickupTime(now.toISOString().slice(0, 16));
+  }, []);
+
+  const placeOrder = async (event) => {
+    event.preventDefault();
+    let orderItems = Object.keys(cartItems).map((itemId) => {
+      const item = food_list.find((food) => food._id === itemId);
+      return item ? { ...item, quantity: cartItems[itemId], resId: item.resId } : null;
+    }).filter(Boolean);
+
+    if (orderItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    let orderData = {
+      orderType,
+      pickupTime: orderType === "takeaway" ? pickupTime : null,
+      items: orderItems,
+      amount: getTotalCartAmount() + 30,
+      resId: orderItems[0]?.resId,
+    };
+
+    try {
+      let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
+      if (response.data.success) {
+        window.location.replace(response.data.session_url);
+      } else {
+        alert("Error placing order");
+      }
+    } catch (error) {
+      console.error("Order placement error:", error);
+      alert("Error placing order. Please try again.");
+    }
+  };
+
   return (
-    <>
-      <form onSubmit={placeOrder} className="place-order">
-        <div className="place-order-left">
-          <p className="title">Delivery Information</p>
-          <div className="multi-fields">
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.firstName}
-              name="firstName"
-              type="text"
-              placeholder="First Name"
-            />
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.lastName}
-              name="lastName"
-              type="text"
-              placeholder="Last Name"
-            />
-          </div>
-          <input
-            required
-            onChange={onChangeHandler}
-            value={data.email}
-            name="email"
-            type="email"
-            placeholder="Email address"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            value={data.street}
-            name="street"
-            type="text"
-            placeholder="Street"
-          />
-          <div className="multi-fields">
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.city}
-              name="city"
-              type="text"
-              placeholder="City"
-            />
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.state}
-              name="state"
-              type="text"
-              placeholder="State"
-            />
-          </div>
-          <div className="multi-fields">
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.pincode}
-              name="pincode"
-              type="text"
-              placeholder="Pin Code"
-            />
-            <input
-              required
-              onChange={onChangeHandler}
-              value={data.country}
-              name="country"
-              type="text"
-              placeholder="Country"
-            />
-          </div>
-          <input
-            required
-            onChange={onChangeHandler}
-            value={data.phone}
-            name="phone"
-            type="text"
-            placeholder="Phone"
-          />
+    <form onSubmit={placeOrder} className="place-order">
+      <div className="place-order-left">
+        <p className="title">Select Order Type</p>
+        <div className="order-type-options">
+          <label>
+            <input type="radio" name="orderType" value="takeaway" checked={orderType === "takeaway"} onChange={() => setOrderType("takeaway")} />
+            Takeaway (Pickup)
+          </label>
+          <label className="disabled">
+            <input type="radio" name="orderType" value="delivery" disabled />
+            Delivery (Coming Soon)
+          </label>
         </div>
 
-        <div className="place-order-right">
-          <div className="cart-total">
-            <h2>Cart Total</h2>
-            <div>
-              <div className="cart-total-details">
-                <p>Subtotal</p>
-                <p>₹{getTotalCartAmount()}</p>
-              </div>
-              <hr />
-              <div className="cart-total-details">
-                <p>Delivery Fee</p>
-                <p>₹{getTotalCartAmount() === 0 ? 0 : 99}</p>
-              </div>
-              <hr />
-              <div className="cart-total-details">
-                <b>Total</b>
-                <b>
-                  ₹{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 99}
-                </b>
-              </div>
-            </div>
-            <button type="submit">PROCEED TO PAYMENT</button>
+        {orderType === "takeaway" && (
+          <div className="pickup-time">
+            <label>Pickup Time:</label>
+            <input
+              type="datetime-local"
+              value={pickupTime}
+              onChange={(e) => setPickupTime(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+            />
           </div>
+        )}
+      </div>
+
+      <div className="place-order-right">
+        <div className="cart-total">
+          <h2>Cart Total</h2>
+          <div>
+            <div className="cart-total-details">
+              <p>Subtotal</p>
+              <p>₹{getTotalCartAmount()}</p>
+            </div>
+            <hr />
+            <div className="cart-total-details">
+              <p>Platform Fee</p>
+              <p>₹30</p>
+            </div>
+            <hr />
+            <div className="cart-total-details">
+              <b>Total</b>
+              <b>₹{getTotalCartAmount() + 30}</b>
+            </div>
+          </div>
+          <button type="submit">PROCEED TO PAYMENT</button>
         </div>
-      </form>
-    </>
+      </div>
+    </form>
   );
 };
 
