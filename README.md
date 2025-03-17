@@ -28,4 +28,4 @@
 ## 💪 Demo
 
 - Deployed on Render
-- Deployed Link : [Click Here](https://food-del-client-af6o.onrender.com)
+- Deployed Link : 
