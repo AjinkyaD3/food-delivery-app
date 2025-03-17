@@ -86,8 +86,9 @@ const StoreContextProvider = (props) => {
   }, [token]);
 
   // ✅ Add to Cart Function
-  const addToCart = async (item, newRestaurantId) => {
+  const addToCart = async (itemId, newRestaurantId) => {
     console.log(`➕ addToCart called: itemId=${itemId}, newRestaurantId=${newRestaurantId}`);
+
     try {
       if (restaurantId && restaurantId !== newRestaurantId) {
         const confirmChange = window.confirm(
@@ -95,33 +96,56 @@ const StoreContextProvider = (props) => {
         );
         // console.log('hey it is done bro it is donr',localStorage.getItem("cart"))
         if (!confirmChange) return;
-
+  
+        console.log("🗑️ Clearing cart...");
         setCartItems({});
         localStorage.removeItem("cart");
-        setRestaurantId(newRestaurantId);
-        localStorage.setItem("restaurantId", newRestaurantId);
+        setRestaurantId(item.restaurant_id);
+        localStorage.setItem("restaurantId", item.restaurant_id);
       }
-
+  
       if (token) {
-        await axios.post(`${url}/api/cart/add`, { itemId }, { headers: { token } });
-        console.log(`✅ Item added to cart in API: ${itemId}`);
+        console.log("🔄 Sending request to add item to API:", item);
+        const response = await axios.post(
+          `${url}/api/cart/add`,
+          {
+            _id: item._id,
+            name: item.name,
+            price: item.price,
+            image_url: item.image_url,
+            restaurant_id: item.restaurant_id,
+          },
+          { headers: { token } }
+        );
+        console.log("✅ API Response:", response.data);
       }
-
+  
       setCartItems((prev) => {
-        const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + 1 };
+        const updatedCart = {
+          ...prev,
+          [item._id]: {
+            name: item.name,
+            price: item.price,
+            image_url: item.image_url,
+            quantity: (prev[item._id]?.quantity || 0) + 1,
+          },
+        };
+        console.log("🛒 Updated Cart Data:", updatedCart);
+  
         localStorage.setItem("cart", JSON.stringify(updatedCart));
-        console.log("🛒 Updated Cart:", updatedCart);
         return updatedCart;
       });
-
+  
       if (!restaurantId) {
-        setRestaurantId(newRestaurantId);
-        localStorage.setItem("restaurantId", newRestaurantId);
+        console.log("🏪 Setting new restaurant ID:", item.restaurant_id);
+        setRestaurantId(item.restaurant_id);
+        localStorage.setItem("restaurantId", item.restaurant_id);
       }
     } catch (error) {
       console.error("❌ Error adding item to cart:", error);
     }
   };
+  
 
   // ✅ Remove from Cart Function
   const removeFromCart = async (itemId) => {

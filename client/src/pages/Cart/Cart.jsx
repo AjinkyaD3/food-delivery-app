@@ -13,8 +13,12 @@ const Cart = () => {
     promoCode,
     discount,
     url,
+<<<<<<< HEAD
+    food_list
+=======
     food_list,
     FoodDetails
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
   } = useContext(StoreContext);
 // console.log('card items is here',cartItems)
   const [enteredPromo, setEnteredPromo] = useState("");
@@ -23,9 +27,16 @@ const Cart = () => {
 
   // ✅ Ensure food list is loaded before rendering
   useEffect(() => {
+<<<<<<< HEAD
+    console.log("📦 cartItems:", cartItems); // Debugging
+
+  }, [cartItems]); // Ensure we check when cart updates
+
+=======
     console.log("📦 cartItems:", cartItems);
   }, [cartItems]); // Ensure we check when cart updates
   
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
 
   // ✅ Handle promo code application
   const handleApplyPromo = () => {
@@ -53,6 +64,69 @@ const Cart = () => {
               <p>Remove</p>
             </div>
             <hr />
+<<<<<<< HEAD
+
+            {cartItems &&
+  Object.keys(cartItems).map((itemId) => {
+    const item = cartItems[itemId];
+    
+    // Debugging logs
+    console.log("🛒 Cart Item Debug:", item);
+
+    if (item?.quantity > 0) {
+      return (
+        <React.Fragment key={itemId}>
+          <div className="cart-items-title cart-items-item">
+            {/* Product Image */}
+            <img
+              src={`${url}/images/${item.image_url || "default.jpg"}`}
+              alt={item.name}
+              className="cart-item-image"
+            />
+
+            {/* Product Name */}
+            <p className="cart-item-name">{item.name}</p>
+
+            {/* Product Price */}
+            <p className="cart-item-price">₹{item.price}</p>
+
+            {/* Quantity Controls */}
+            <div className="cart-quantity-controls">
+              <button
+                className="cart-btn"
+                onClick={() => removeFromCart(itemId)}
+              >
+                -
+              </button>
+              <span>{item.quantity || 1}</span>
+              <button
+                className="cart-btn"
+                onClick={() => addToCart(item._id)}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Total Price */}
+            <p className="cart-item-total-price">
+              ₹{item.price * (item.quantity || 1)}
+            </p>
+
+            {/* Remove Item */}
+            <p
+              onClick={() => removeFromCart(itemId)}
+              className="cart-item-remove cross"
+            >
+              x
+            </p>
+          </div>
+          <hr />
+        </React.Fragment>
+      );
+    }
+    return null;
+  })}
+=======
 {/* //changes needs to made here  */}
             {food_list.map((item) => {
            
@@ -62,23 +136,11 @@ const Cart = () => {
                       <img src={`${url}/images/${item.image}`} alt={item.name} />
                       <p>{item.name}</p>
                       <p>₹{item.price}</p>
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
 
-                      <div className="cart-quantity-controls">
-                        <button
-                          className="cart-btn"
-                          onClick={() => removeFromCart(item._id)}
-                        >
-                          -
-                        </button>
-                        <span>{cartItems[item._id]}</span>
-                        <button
-                          className="cart-btn"
-                          onClick={() => addToCart(item._id)}
-                        >
-                          +
-                        </button>
-                      </div>
 
+<<<<<<< HEAD
+=======
                       <p>₹{item.price * item.price}</p>
                       <p onClick={() => removeFromCart(item._id)} className="cross">
                         x
@@ -90,6 +152,7 @@ const Cart = () => {
               
               return null;
             })}
+>>>>>>> fa096529ced521858dce041720269e7113904a0e
           </div>
 
           {/* Bottom Section */}
