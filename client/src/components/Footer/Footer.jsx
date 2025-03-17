@@ -35,14 +35,14 @@ const Footer = () => {
           <div className="footer-content-right">
             <h2>GET IN TOUCH</h2>
             <ul>
-              <li>+91-9170602005</li>
-              <li>contact@tomato.com</li>
+              <li>+91-8080383389</li>
+              <li>contact@eatzee.com</li>
             </ul>
           </div>
         </div>
         <hr />
         <p className="footer-copyright">
-          Copyright 2024 © Tomato - All Rights Reserved.
+          Copyright 2024 © EatZee - All Rights Reserved.
         </p>
       </div>
     </>
