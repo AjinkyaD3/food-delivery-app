@@ -33,9 +33,16 @@ const PlaceOrder = () => {
   const placeOrder = async (event) => {
     event.preventDefault();
     let orderItems = Object.keys(cartItems).map((itemId) => {
-      const item = food_list.find((food) => food._id === itemId);
-      return item ? { ...item, quantity: cartItems[itemId], resId: item.resId } : null;
+      const item = cartItems[itemId];
+      return { 
+        ...item, 
+        quantity: item.quantity, 
+        restaurant_id: item.restaurant_id  // Fix: Correctly assign `resId`
+      };
     }).filter(Boolean);
+    
+    
+    
 
     if (orderItems.length === 0) {
       alert("Your cart is empty!");
