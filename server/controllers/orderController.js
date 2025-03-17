@@ -8,9 +8,50 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Fixed typo in STRIP
 const placeOrder = async (req, res) => {
   const frontend_url = "http://localhost:5173";
 
-  console.log("place order request",req.body)
- const {orderType, pickupTime, items, amount, userId } = req.body;
- const restaurant_id = items[0].restaurant_id;
+  console.log("place order request", req.body)
+  try {
+    const { orderType, pickupTime, items, amount, userId } = req.body;
+    const restaurant_id = items[0].restaurant_id; // Extract restaurant ID
+  
+    const newOrder = new orderModel({
+      userId,
+      items,
+      amount,
+      orderType, // New field
+      pickupTime, // New field
+      resId: restaurant_id, // New field
+    });
+  
+    await newOrder.save();
+    console.log("✅ Order successfully inserted:", newOrder); // Success log
+  
+    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+  
+    const line_items = items.map((item) => ({
+      price_data: {
+        currency: "inr",
+        product_data: { name: item.name },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    }));
+  
+    line_items.push({
+      price_data: {
+        currency: "inr",
+        product_data: { name: "Delivery Charges" },
+        unit_amount: 99 * 100,
+      },
+      quantity: 1,
+    });
+  
+    res.status(201).json({ success:true, message: "Order placed successfully", order: newOrder });
+  } catch (error) {
+    console.error("❌ Error in placeOrder:", error);
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+  
+  
 
 
   // try {
@@ -23,41 +64,41 @@ const placeOrder = async (req, res) => {
   //     address,
   //   });
 
-//     await newOrder.save();
-//     await userModel.findByIdAndUpdate(userId, { cartData: {} });
+  //     await newOrder.save();
+  //     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-//     const line_items = items.map((item) => ({
-//       price_data: {
-//         currency: "inr",
-//         product_data: { name: item.name },
-//         unit_amount: item.price * 100,
-//       },
-//       quantity: item.quantity,
-//     }));
+  //     const line_items = items.map((item) => ({
+  //       price_data: {
+  //         currency: "inr",
+  //         product_data: { name: item.name },
+  //         unit_amount: item.price * 100,
+  //       },
+  //       quantity: item.quantity,
+  //     }));
 
-//     line_items.push({
-//       price_data: {
-//         currency: "inr",
-//         product_data: { name: "Delivery Charges" },
-//         unit_amount: 99 * 100,
-//       },
-//       quantity: 1,
-//     });
+  //     line_items.push({
+  //       price_data: {
+  //         currency: "inr",
+  //         product_data: { name: "Delivery Charges" },
+  //         unit_amount: 99 * 100,
+  //       },
+  //       quantity: 1,
+  //     });
 
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ["card"],
-//       line_items,
-//       mode: "payment",
-//       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-//       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-//     });
+  //     const session = await stripe.checkout.sessions.create({
+  //       payment_method_types: ["card"],
+  //       line_items,
+  //       mode: "payment",
+  //       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
+  //       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
+  //     });
 
-//     res.json({ success: true, session_url: session.url });
-//   } catch (error) {
-//     console.error("Error in placeOrder:", error);
-//     res.status(500).json({ success: false, message: "Failed to place order" });
-//   }
- };
+  //     res.json({ success: true, session_url: session.url });
+  //   } catch (error) {
+  //     console.error("Error in placeOrder:", error);
+  //     res.status(500).json({ success: false, message: "Failed to place order" });
+  //   }
+};
 
 // Verifying order payment status
 const verifyOrder = async (req, res) => {
