@@ -8,7 +8,7 @@ const Footer = () => {
       <div id="footer" className="footer">
         <div className="footer-content">
           <div className="footer-content-left">
-            <img src={assets.logo} alt="" />
+            {/* <img src={assets.logo} alt="" /> */}
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsam
               sunt quod quae incidunt iure maxime, adipisci natus! Numquam sint
