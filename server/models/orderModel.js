@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema({
   resId: { type: String, required: true }, // Restaurant ID to track which restaurant receives the order
   items: { type: Array, required: true },
   amount: { type: Number, required: true },
-  address: { type: Object, required: true },
+  address: { type: Object, required: false },
   status: { type: String, default: "Food Processing" },
   date: { type: Date, default: Date.now() },
   payment: { type: Boolean, default: false },

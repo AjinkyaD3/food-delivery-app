@@ -8,51 +8,56 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Fixed typo in STRIP
 const placeOrder = async (req, res) => {
   const frontend_url = "http://localhost:5173";
 
-  try {
-    const { userId, items, amount, address } = req.body;
+  console.log("place order request",req.body)
+ const {orderType, pickupTime, items, amount, userId } = req.body;
+ const restaurant_id = items[0].restaurant_id;
 
-    const newOrder = new orderModel({
-      userId,
-      items,
-      amount,
-      address,
-    });
 
-    await newOrder.save();
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+  // try {
+  //   const { userId, items, amount, address } = req.body;
 
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency: "inr",
-        product_data: { name: item.name },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.quantity,
-    }));
+  //   const newOrder = new orderModel({
+  //     userId,
+  //     items,
+  //     amount,
+  //     address,
+  //   });
 
-    line_items.push({
-      price_data: {
-        currency: "inr",
-        product_data: { name: "Delivery Charges" },
-        unit_amount: 99 * 100,
-      },
-      quantity: 1,
-    });
+//     await newOrder.save();
+//     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items,
-      mode: "payment",
-      success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-    });
+//     const line_items = items.map((item) => ({
+//       price_data: {
+//         currency: "inr",
+//         product_data: { name: item.name },
+//         unit_amount: item.price * 100,
+//       },
+//       quantity: item.quantity,
+//     }));
 
-    res.json({ success: true, session_url: session.url });
-  } catch (error) {
-    console.error("Error in placeOrder:", error);
-    res.status(500).json({ success: false, message: "Failed to place order" });
-  }
-};
+//     line_items.push({
+//       price_data: {
+//         currency: "inr",
+//         product_data: { name: "Delivery Charges" },
+//         unit_amount: 99 * 100,
+//       },
+//       quantity: 1,
+//     });
+
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items,
+//       mode: "payment",
+//       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
+//       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
+//     });
+
+//     res.json({ success: true, session_url: session.url });
+//   } catch (error) {
+//     console.error("Error in placeOrder:", error);
+//     res.status(500).json({ success: false, message: "Failed to place order" });
+//   }
+ };
 
 // Verifying order payment status
 const verifyOrder = async (req, res) => {
