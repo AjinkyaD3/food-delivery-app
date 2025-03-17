@@ -1,10 +1,12 @@
 import axios from "axios";
 import { createContext, useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
+  const [foodData,setFootData]=useState({})
   const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId") || "");
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [food_list, setFoodList] = useState([]);
@@ -50,6 +52,7 @@ const StoreContextProvider = (props) => {
   const loadCartData = async () => {
     if (!token) {
       const localCart = JSON.parse(localStorage.getItem("cart")) || {};
+      console.log(localCart)
       setCartItems(localCart);
       console.log("✅ Loaded cart from localStorage:", localCart);
       return;
@@ -83,14 +86,14 @@ const StoreContextProvider = (props) => {
   }, [token]);
 
   // ✅ Add to Cart Function
-  const addToCart = async (itemId, newRestaurantId) => {
+  const addToCart = async (item, newRestaurantId) => {
     console.log(`➕ addToCart called: itemId=${itemId}, newRestaurantId=${newRestaurantId}`);
-
     try {
       if (restaurantId && restaurantId !== newRestaurantId) {
         const confirmChange = window.confirm(
           "Your cart contains items from a different restaurant. Do you want to clear the cart and add new items?"
         );
+        // console.log('hey it is done bro it is donr',localStorage.getItem("cart"))
         if (!confirmChange) return;
 
         setCartItems({});
@@ -172,6 +175,9 @@ const StoreContextProvider = (props) => {
     setPromoCode(code);
   };
 
+  const GetFoodDeails=()=>{
+   const value=getTotalCartAmount() 
+  }
   const contextValue = {
     food_list,
     restaurants,
